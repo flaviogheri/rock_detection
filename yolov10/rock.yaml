@@ -1,0 +1,7 @@
+path: /home/korneel/Documents/augmentation/he_yolo
+train: images/train  # Path to training images
+val: images/test    # Path to validation images
+ 
+# class names
+names: 
+  0: 'rock'
