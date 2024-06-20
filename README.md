@@ -1,9 +1,6 @@
 # Rocking on the lunar surface!
 **Date:** June 2024
-**Authors:** 
-Flavio Gheri, 6083048, F.A.Gheri@student,tudelft.nl
- Korneel Somers, 
- Jelle Vogel
+**Authors:** Flavio Gheri, Korneel Somers, Jelle Vogel
 **Git Repository:** [rock_detection](https://github.com/flaviogheri/rock_detection.git)
 
 
@@ -77,8 +74,16 @@ Single Shot Detection (SSD) is an approach which applies various aspect ratios a
 
 The decision to use one-stage models is driven by their design advantages for real-time operation. Unlike two-stage models, which first generate region proposals before classifying them, one-stage models such as YOLO and SSD integrate these steps into a single process. This allows for faster decision-making, which in turn reduces latency. Therefore, this type of detector will be useful to perform real-time object avoidance on the lunar surface.
 
-### Results
-The models are assessed using standard performance metrics such as precision, recall, F1-score, and accuracy. Additionally, we evaluate their 'lightweightedness' because it will have to operate on resource-constrained systems such as the rover. The lightweightedness of each model is analyzed based on latency, the number of parameters, and the computational efficiency, measured in Floating Point Operations Per Second (FLOPs). All the results are summerized in the tables below. Due to limited available resources only a part of the dataset was used (300 images with 2706 labeled objects).
+#### Results
+The models are assessed using standard performance metrics such as precision, recall, F1-score, and mAP50 (Mean Average Precision at IoU=0.50). Additionally, we evaluate their 'lightweightedness' because it will have to operate on resource-constrained systems such as the rover. The lightweightedness of each model is analyzed based on latency, the number of parameters, and the computational efficiency, measured in Floating Point Operations Per Second (FLOPs). All the results are summerized in the tables below. Due to limited available resources only a part of the dataset was used (300 images with 2706 labeled objects).
+
+- **Precision:** The proportion of true positive predictions among all positive predictions expressed as value between 0 and 1.
+- **Recall:** The proportion of true positive predictions among all actual positive instances expressed as value between 0 and 1.
+- **F1-score:** The harmonic mean of precision and recall.
+- **mAP50** (Mean Average Precision at IoU=0.50): The average precision for detecting objects, using a threshold of 0.50 for the Intersection over Union (IoU). It is a measure of the model's detection accuracy and is expressed as value between 0 and 1.
+- **Latency:** The time it takes for a model to process an input and produce an output. It is important for real-time applications like ours and is measured in milliseconds (ms).
+- **Number of Parameters:** The total number of parameters within a model, indicating its size and complexity. The number of parameters is measured in millions (M).
+- **FLOPs** (Floating Point Operations Per Second): Measure of the computational efficiency of the model, which indicates how many operations the model performs per second. In our case the FLOPs are measured in billions (G).
 
 
 | **Model** | **Precision** | **Recall** | **F1-score** | **mAP50** |
@@ -89,7 +94,7 @@ The models are assessed using standard performance metrics such as precision, re
 | YOLOv10-B | 0.35745       | 0.19087    | 0.57261      | 0.15722   |
 | YOLOv10-L | 0.01429       | 0.45436    | 1.36308      | 0.01047   |
 | YOLOv10-X | 0.50835       | 0.33679    | 1.01037      | 0.31332   |
-| SSD       |    0.65       |  0.39      |  0.4875        | 0.36080   |
+| SSD (MobilenetV2)      |    0.65       |  0.39      |  0.4875        | 0.36080   |
 
 
     
@@ -101,9 +106,10 @@ The models are assessed using standard performance metrics such as precision, re
 | YOLOv10-B | 5.74             | 92                          | 19.1           |
 | YOLOv10-L | 7.28             | 120.3                       | 24.4           |
 | YOLOv10-X | 10.7             | 160.4                       | 29.5           |
-| SSD       | 208.05            | 0.05                        | 24.83          |
+| SSD (MobilenetV2)      | 208.05            | 0.05                        | 24.83          |
     
-    
+
+To compare the different models in a more visual way, the graph below shows the performance of each model (amount of parameters in millions are found between brackets after every model).
 <img src="https://hackmd.io/_uploads/BJuZuqnHC.png" alt="yolo results" style="border: 1px solid #DDD; padding: 5px;"> 
 
 <div style="text-align: center;">
@@ -112,7 +118,7 @@ The models are assessed using standard performance metrics such as precision, re
 
 
 
-### Discussion
+#### Discussion
 There are two aspects to discuss: performance and lightweightedness. Starting with the performance of the models you see significant variation across the scales. The YOLOv10-N (Nano) scored very poorly. In the confusion matrix below, you can see that everything was categorized as background and not a single rock was recognized. This is likely due to the limited capacity of the model with too few parameters to accurately detect and classify the rocks.
 
 ![yolo_pictures_nano](https://hackmd.io/_uploads/rJsEOzdHR.jpg)
@@ -159,7 +165,6 @@ The limited datasets of lunar rocks can be enhanced through data augmentation to
 
 - **Warping:** Distorting the image by pulling the two upper corners towards the center to enhance the model's ability to recognize lunar rocks from various angles and shapes.
 - **Histogram:** Modifying the distribution of pixel intensities in the image to improve contrast and brightness of some features for better detection.
-
 - **Pooling trick:** Cutting the image into strips and rearranging them to create several new variations with the purpose to make the model more generalizable as it creates new shapes and orientations of the rocks.
 
 <h4 style="text-align: center;">Warping</h4>
@@ -214,8 +219,8 @@ Finally, pooling was applied to able to increase the training dataset whilst als
     <div style="width: 38%; text-align: right;">
         <img src="https://hackmd.io/_uploads/BkQKaSnrR.png" alt="Image 1" style="max-height: 200px;">
     </div>
-    <div style="width: 75%;">
-        <img src="https://hackmd.io/_uploads/SJA5pS2S0.png" alt="Image 2" style="width: 100%;">
+    <div style="width: 70%;">
+        <img src="https://hackmd.io/_uploads/SJA5pS2S0.png" alt="Image 2" style="width: 100;">
     </div>
 </div>
 <div style="text-align: center;">
@@ -225,17 +230,27 @@ Finally, pooling was applied to able to increase the training dataset whilst als
 
 
 
-### Results
+#### Results
 
 The three techniques will be compared based on same performance metrics as in the previous experiment, accuracy, precision, recall, and F1 Score. 
 
-| **Model**     | **Precision** | **Recall** | **F1-score** | **mAP50** |
+| **Augmentation Technique**     | **Precision** | **Recall** | **F1-score** | **mAP50** |
 |---------------|---------------|------------|--------------|-----------|
-| Warping       | 0.11534       | 0.35741    | 1.07223      | 0.0707    |
-| Histogram     | 0.01157       | 0.58268    | 1.74804      | 0.00898   |
-| Pooling Trick | 0.4971        | 0.36771    | 1.10313      | 0.34467   |
+| YOLOv10-M without augmentation | 0.54144       | 0.42739    | 1.28217      | 0.40736   |
+| YOLOv10-M with Warping       | 0.11534       | 0.35741    | 1.07223      | 0.0707    |
+| YOLOv10-M with Histogram     | 0.01157       | 0.58268    | 1.74804      | 0.00898   |
+| YOLOv10-M with Pooling Trick | 0.4971        | 0.36771    | 1.10313      | 0.34467   |
 
-### Discussion
+#### Discussion
+
+
+Based on the findings, augmentation techniques notably diminished the model's performance. Particularly, histogram equalization, intended to enhance performance as a preprocessing method, it did not yield improvements and will not be implemented in the final dataset. A reason for this discrepancy is that histogram equalization enhances contrast primarily on smaller rocks, which are not labeled in the dataset used, resulting in further loss. However, it should be noted that the overall model performance is sufficiently low that the absence of certain labels does not fully explain the situation and further evaluation should be made.
+
+Regarding image warping, compression sensitivity was evident upon image inspection. Future evaluations should consider a cropped perspective to assess potential impact. Overall, although preprocessing techniques showed some differences, the notable decrease in performance, particularly in recall, suggests that data augmentation may not be beneficial at all, especially in compairison to what was originally anticipated. Confusion matrices for each test and example results are provided below for reference.
+
+
+
+
 
 ![warping](https://hackmd.io/_uploads/ry7Qn52B0.png)
 <div style="text-align: center;">
@@ -267,25 +282,46 @@ To try and replicate the real-life scenario of a deployed lunar-zebro as well as
 
 
 #### Results
-| Ideal Model  | Precision | Recall | F1-score | Accuracy |
+| Ideal Model  | Precision | Recall | F1-score | mAP50 |
 |--------|-----------|--------|----------|----------|
-| Artificial Test Data |           |        |          |          |
-| Real Test Data |           |        |          |          |
+| YOLOv10-M without augmentation | 0.54144       | 0.42739    | 1.28217      | 0.40736   |
+| Real Test Data | 0.1791	|0.5691	| 0.2725	| 0.1577
+
 
 #### Discussion
+Unfortunately, it seems as if the model performs significantly better on other samples from the same dataset as it was trained on.
+<div style="display: flex; justify-content: space-around; align-items: center; text-align: center">
+    <img src="https://hackmd.io/_uploads/HkGyXn3r0.jpg" alt="Image 1" style="max-width: 50%; height: auto; margin: 10px;">
+    <img src="https://hackmd.io/_uploads/ry5kV2hH0.jpg" alt="Image 2" style="max-width: 50%; height: auto; margin: 10px;">
+</div>
+<div style="text-align: center;">
+    <i>Left: Confusion matrix with a confidence threshold of 0.75. Right: Note that the precision significantly peaks at 0.9.</i>
+</div>
 
+In the confusion matrix above as well as the images below, we can see that the amount of False Positives are particularly high with these settings. At the same time, the recall is close to 0.5, which only shows that the model is not very good at differentiating between rock and not-rock (As if it is flipping a coin).
 
+<div style="display: flex; justify-content: space-around; align-items: center; text-align: center">
+    <img src="https://hackmd.io/_uploads/ryxrXnnSR.jpg" alt="Image 1" style="max-width: 50%; height: auto; margin: 10px;">
+    <img src="https://hackmd.io/_uploads/rJ4SQ22rA.jpg" alt="Image 2" style="max-width: 50%; height: auto; margin: 10px;">
+</div>
+<div style="text-align: center;">
+    <i>Two samples the lunar test bed dataset.</i>
+</div>
 
+The images make it even more clear that the model is making many guesses of rocks, except for the correct rocks. Whenever there is a large, obvious rock in the image, it still fails to see it, but it does classify many small pebbles, which this dataset did not include, as rocks. 
 
 ## 4. Conclusion and Further Work
+We have performed a comprehensive research to determine which combination of model and data augmentation would perform the best for rock detection on a lunar surface. We have found that the best performing model is YOLOv10-M, with SSD with MobilenetV2 backbone a close runner-up. However, SSD did show a significantly lower amount of Floating Point operations than YOLOv10-M.
 
+To enhance the model's adaptability to diverse rover perspectives and real lunar images, we conducted tests on multiple data augmentation techniques including histogram equalization, pixel pooling and perspective warping. Ultimately, however, none of these techniques yielded the expected improvements, leaving us to exclude them from the final training and testing on the real rover dataset.
 
+In the end, we chose the best model to view it's performance on our lunar test bed dataset. The results showed a significant decrease in performance on the lunar test bed dataset as compared to other rendered images.
 ### 4.2 Further Work
 Due to time constraints, the datasets shown have only been trained on 300 images out of the 9000 image dataset and we have only performed one epoch. Increasing the size of the dataset or the amount of epochs simply takes too much time that we did not have to fit the constraints of this assignment. This means that the full potential of the model is not shown in the metrics presented by this blogpost. The first step for improvement is to make a proper comparison between these models by training with the full dataset on a large amount of epochs.
 
 We also recognize that we did use relatively large models in our comparison. There might be models out there that could show to be a better fit for the lunar zebro due to the energy consumption constraints. Thus, for further work we intend to compare different models with less parameters to see if these can still get decent enough results.
 
-Finally, the data was created by using a dataset of renders of lunar surfaces which has been labeled with segmentation. Since we required bounding boxes for our labels, we have used opencv to draw the boxes around the contours found in the segmentation. This has lead to the data labels missing certain rocks. For future work we aim to spend some time to create a properly labeled dataset with lunar images.
+Finally, the data was created by using a dataset of renders of lunar surfaces which has been labeled with segmentation. Since we required bounding boxes for our labels, we have used opencv to draw the boxes around the contours found in the segmentation. This has lead to the data labels missing certain rocks. The labels of the dataset being off many times, might be the main driving factor behind our disappointing results. For future work we aim to spend some time to create a properly labeled dataset with lunar images. With this new dataset we do not rule out to try to perform the data augmentation again.
 
 ## References
 [1] MVP Aerospace, 'KissCAM Datasheet and User Manual', 2024.
